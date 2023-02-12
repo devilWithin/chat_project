@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ChatScreen extends StatefulWidget {
+  final String chatId;
   const ChatScreen({
-    Key? key,
+    Key? key, required this.chatId,
   }) : super(key: key);
 
   @override
@@ -27,7 +28,7 @@ class _ChatScreenState extends State<ChatScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const ChatStreamBuilder(),
+              ChatStreamBuilder(chatId: widget.chatId),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(

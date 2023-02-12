@@ -1,24 +1,38 @@
 import 'package:flutter/material.dart';
 
-class MessageBubble extends StatelessWidget {
+class MessageBubble extends StatefulWidget {
   final String message;
   final bool isCustomerService;
+  final bool isRead;
+  final String messageId;
+  final String chatId;
 
   const MessageBubble(
-      {Key? key, required this.message, required this.isCustomerService})
+      {Key? key,
+      required this.message,
+      required this.isCustomerService,
+      required this.isRead,
+      required this.messageId,
+      required this.chatId})
       : super(key: key);
 
   @override
+  State<MessageBubble> createState() => _MessageBubbleState();
+}
+
+class _MessageBubbleState extends State<MessageBubble> {
+  @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment:
-          isCustomerService ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+      crossAxisAlignment: widget.isCustomerService
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.end,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: isCustomerService
+            mainAxisAlignment: widget.isCustomerService
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.end,
             children: [
@@ -29,17 +43,30 @@ class MessageBubble extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(32)),
                 child: Text(
-                  message,
+                  widget.message,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: Colors.white,
                       ),
                 ),
               ),
-              Icon(
-                Icons.check_circle_rounded,
-                size: 10,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              !widget.isCustomerService
+                  ? Row(
+                      children: [
+                        Icon(
+                          Icons.check,
+                          size: 8,
+                          color: widget.isRead ? Colors.blue : Colors.grey,
+                        ),
+                        widget.isRead
+                            ? const Icon(
+                                Icons.check,
+                                size: 8,
+                                color: Colors.blue,
+                              )
+                            : const SizedBox.shrink()
+                      ],
+                    )
+                  : const SizedBox.shrink(),
             ],
           ),
         )
