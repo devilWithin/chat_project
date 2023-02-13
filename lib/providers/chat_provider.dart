@@ -1,41 +1,80 @@
+import 'package:chat_project/models/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ChatProvider extends ChangeNotifier {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+
+  bool isReplyContainerShown = false;
 
   Future<void> sendFirebaseMessage({
-    required String textMessage,
-    required String uID,
+    required Message message,
   }) async {
-    await _firestore.collection('customer-service').doc(uID).set({
-      'is_read': false,
-      'time': Timestamp.now(),
-      'sender_id': uID,
-      'receiver_id': 'customer-service',
-      'text_message': textMessage,
+    await _fireStore.collection('customer-service').doc(message.senderId).set({
+      'is_read': message.isRead,
+      'time': message.timestamp,
+      'sender_id': message.senderId,
+      'receiver_id': message.receiverId,
+      'text_message': message.textMessage,
+      'emoji': message.emoji,
+      'reply_text': message.replyText,
+      'reply_text_id': message.replyTextId,
     });
-    await _firestore
+    await updateRecentMessage(message: message);
+  }
+
+  Future<void> updateRecentMessage({
+    required Message message,
+}) async {
+    await _fireStore
         .collection('customer-service')
-        .doc(uID)
+        .doc(message.senderId)
         .collection('messages')
         .doc()
         .set({
-      'sender_id': uID,
-      'is_read': false,
-      'text_message': textMessage,
-      'receiver_id': 'customer-service',
-      'time': Timestamp.now(),
+      'is_read': message.isRead,
+      'time': message.timestamp,
+      'sender_id': message.senderId,
+      'receiver_id': message.receiverId,
+      'text_message': message.textMessage,
+      'emoji': message.emoji,
+      'reply_text': message.replyText,
+      'reply_text_id': message.replyTextId,
     });
   }
 
   List<Map<String, dynamic>> chats = [];
 
   Future<void> getUserAllChats() async {
-    final result = await _firestore.collection('customer-service').get();
+    final result = await _fireStore.collection('customer-service').get();
     for (var oneChat in result.docs) {
       chats.add(oneChat.data());
     }
+    notifyListeners();
+  }
+
+  void openReplyDialog({
+  required String textMessage,
+  required String messageId,
+}) async {
+    isReplyContainerShown = true;
+    notifyListeners();
+    setReplyMessage(textMessage: textMessage,messageId: messageId);
+  }
+
+  Message replyMessage = Message();
+
+  Future<void> setReplyMessage({
+  required String textMessage,
+  required String messageId,
+}) async {
+    if(isReplyContainerShown) {
+      replyMessage.textMessage = textMessage;
+    }
+  }
+
+  void closeReplyDialog() {
+    isReplyContainerShown = false;
     notifyListeners();
   }
 }

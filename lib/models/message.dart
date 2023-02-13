@@ -1,13 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Message {
-  int? id;
-  String? text;
-  int? senderId;
-  int? receiverId;
+  String? textMessage;
+  String? senderId;
+  String? receiverId;
+  String? emoji;
+  Timestamp? timestamp;
+  bool isRead;
+  String? replyText;
+  String? replyTextId;
 
   Message({
-    this.id,
-    this.text,
+    this.textMessage,
     this.receiverId,
     this.senderId,
+    this.emoji,
+    this.timestamp,
+    this.isRead = false,
+    this.replyText,
+    this.replyTextId,
   });
 }
